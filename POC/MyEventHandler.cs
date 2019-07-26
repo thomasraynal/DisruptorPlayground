@@ -9,24 +9,24 @@ namespace DisruptorPlayground.POC
 {
     public class MyEventHandler : IDisposable
     {
-        public volatile int Sequence = -1;
+        public volatile int Sequence = 0;
         private string _name;
         private CancellationTokenSource _cancel;
         private MyEventHandler _dependency;
         private MyRingBuffer _ringBuffer;
         private int _waitUntilNextEvent;
         private Task _workProc;
-        private ILogger _logger;
 
-        public MyEventHandler(string name, ILogger logger, MyRingBuffer ringBuffer, MyEventHandler dependency, int waitUntilNextEvent = 0)
+        public List<string> Logs;
+
+        public MyEventHandler(string name, MyRingBuffer ringBuffer, MyEventHandler dependency)
         {
             _name = name;
             _cancel = new CancellationTokenSource();
             _dependency = dependency;
             _ringBuffer = ringBuffer;
-            _waitUntilNextEvent = waitUntilNextEvent;
+            Logs = new List<string>();
             _workProc = Task.Run(DoWork, _cancel.Token);
-            _logger = logger;
         }
 
 
@@ -34,15 +34,15 @@ namespace DisruptorPlayground.POC
         {
             if (_dependency == null)
             {
-            
+                var spinWait = new SpinWait();
+
                 while (!_cancel.IsCancellationRequested)
                 {
-
-                    Thread.Sleep(_waitUntilNextEvent);
+                    spinWait.SpinOnce();
 
                     var message = $"Create message new event {DateTime.Now.Ticks}";
 
-                    _ringBuffer.Buffer[(Sequence + 1) % _ringBuffer.Size] = Encoding.UTF8.GetBytes(message);
+                    _ringBuffer.Buffer[(Sequence) % _ringBuffer.Size] = Encoding.UTF8.GetBytes(message);
 
                     Sequence++;
                 }
@@ -54,7 +54,9 @@ namespace DisruptorPlayground.POC
                 {
                     SpinWait.SpinUntil(() => _dependency.Sequence > Sequence);
 
-                    _logger.LogInformation($"{_name} do work {++Sequence} {Encoding.UTF8.GetString(_ringBuffer.Buffer[Sequence % _ringBuffer.Size])}");
+                    Logs.Add($"{_name} do work {Sequence} {Encoding.UTF8.GetString(_ringBuffer.Buffer[Sequence % _ringBuffer.Size])}");
+
+                    Sequence++;
 
                 }
             }
