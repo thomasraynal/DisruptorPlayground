@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DisruptorPlayground.POC
+{
+    public class MyEventHandler
+    {
+        public volatile int Sequence;
+
+        public void Handle(Event @event)
+        {
+
+        }
+    }
+}
