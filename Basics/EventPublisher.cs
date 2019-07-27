@@ -13,7 +13,7 @@ namespace DisruptorPlayground.Basics
     {
         private CancellationTokenSource _cancel;
         private Disruptor<Event> _disruptor;
-        private readonly int _averageFrequency;
+        private readonly int _frequency;
         private readonly Task _workProc;
 
         private string _currentMessage;
@@ -27,17 +27,18 @@ namespace DisruptorPlayground.Basics
               .Select(s => s[_rand.Next(s.Length)]).ToArray());
         }
 
-        public EventPublisher(int averageFrequency, Disruptor<Event> disruptor)
+        public EventPublisher(int frequency, Disruptor<Event> disruptor)
         {
             _cancel = new CancellationTokenSource();
             _disruptor = disruptor;
-            _averageFrequency = averageFrequency;
+            _frequency = frequency;
             _workProc = Task.Run(DoWork, _cancel.Token);
         }
 
         public void Dispose()
         {
             _cancel.Cancel();
+            _disruptor.Shutdown();
         }
 
         public void DoWork()
@@ -45,13 +46,13 @@ namespace DisruptorPlayground.Basics
 
             while (!_cancel.IsCancellationRequested)
             {
-                var bound = (int)(_averageFrequency * 0.1);
 
                 _currentMessage = RandomString(10);
 
                 _disruptor.PublishEvent(this);
 
-                Thread.Sleep(_rand.Next(_averageFrequency - bound, _averageFrequency + bound));
+                Thread.Sleep(_frequency);
+
             }
         }
 

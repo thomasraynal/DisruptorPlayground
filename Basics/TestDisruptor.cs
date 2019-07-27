@@ -18,9 +18,13 @@ namespace DisruptorPlayground.Basics
 
             var handlerA = new EventHandlerA();
             var handlerB = new EventHandlerB();
+            var cleaner = new CleanerHandler();
 
             disruptor.HandleEventsWith(handlerA)
-                     .Then(handlerB);
+                     .Then(handlerB)
+                     .Then(cleaner);
+
+            var before = GC.CollectionCount(0);
 
             var ringBuffer = disruptor.Start();
 
@@ -28,8 +32,16 @@ namespace DisruptorPlayground.Basics
 
             await Task.Delay(750);
 
+            publisher.Dispose();
+
+            var after = GC.CollectionCount(0);
+            Assert.AreEqual(before, after);
+
             Assert.AreEqual(2, handlerA.HandledEvents.Count);
             Assert.AreEqual(2, handlerB.HandledEvents.Count);
+
+            
+
 
         }
 
