@@ -10,8 +10,25 @@ namespace DisruptorPlayground.Advanced1
     public class TestAdvanced1
     {
         [Test]
-        public async Task ShouldTestDisruptor()
+        public void ShouldTestOneEventPublish()
         {
+            var ioHandler = new IOPersistanceEventHandler();
+            var stateHandler = new StateHolderEventHandler();
+            var cleanerHandler = new CleanerEventHandler();
+
+            var engine = new FxPricingEngine(ioHandler, stateHandler, cleanerHandler);
+
+            engine.Start();
+
+            var publisher = new FxPricePublisher(engine, true);
+
+            publisher.Start();
+
+            publisher.PublishOne();
+
+            
+        
+
         }
 
     }

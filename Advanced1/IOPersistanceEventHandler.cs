@@ -23,7 +23,7 @@ namespace DisruptorPlayground.Advanced1
 
             if (endOfBatch)
             {
-                Thread.Sleep(500);
+                Thread.Sleep(10);
                 WriteCount++;
                 _currentBatch.Clear();
             }

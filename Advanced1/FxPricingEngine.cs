@@ -13,13 +13,24 @@ namespace DisruptorPlayground.Advanced1
         private readonly Disruptor<FxPricingEvent> _disruptor;
         private readonly RingBuffer<FxPricingEvent> _ringBuffer;
 
-        public FxPricingEngine()
+        public FxPricingEngine(params IEventHandler<FxPricingEvent>[] handlers)
         {
             _disruptor = new Disruptor<FxPricingEvent>(() => new FxPricingEvent(), 16384, TaskScheduler.Default, ProducerType.Single, new BusySpinWaitStrategy());
 
-            _disruptor.HandleEventsWith(new StateHolderEventHandler())
-                      .Then(new IOPersistanceEventHandler())
-                      .Then(new CleanerEventHandler());
+
+            EventHandlerGroup<FxPricingEvent> group = null;
+
+            foreach (var handler in handlers)
+            {
+                if (null == group)
+                {
+                    group = _disruptor.HandleEventsWith(handler);
+                }
+                else
+                {
+                    group = group.Then(handler);
+                }
+            }
 
             _ringBuffer = _disruptor.RingBuffer;
         }
