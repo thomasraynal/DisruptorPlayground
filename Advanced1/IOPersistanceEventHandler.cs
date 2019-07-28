@@ -21,10 +21,11 @@ namespace DisruptorPlayground.Advanced1
         {
             _currentBatch.Append($"{data.Ask};{data.Bid};{data.CcyPair};{data.Marketplace};{data.Timestamp}");
 
+            WriteCount++;
+
             if (endOfBatch)
             {
                 Thread.Sleep(10);
-                WriteCount++;
                 _currentBatch.Clear();
             }
         }

@@ -8,8 +8,18 @@ using System.Threading.Tasks;
 
 namespace DisruptorPlayground.Advanced1
 {
+    public class Cache
+    {
+        public string CcyPair;
+        public double Bid;
+        public double Ask;
+        public string Marketplace;
+    }
+
     public class FxPricePublisher : IDisposable
     {
+ 
+
         private readonly Random _random = new Random();
         private readonly FxPricingEngine _fxPricingEngine;
         private readonly CancellationTokenSource _cancel;
@@ -21,13 +31,15 @@ namespace DisruptorPlayground.Advanced1
         private readonly string[] _marketplaces = new[] { "fxConnect", "Harmony" };
         private readonly string[] _ccyPairs = new[] { "EUR/USD", "EUR/JPY", "EUR/GPB", "EUR/CAD" };
 
+        public List<Cache> Cache { get; }
+
         public FxPricePublisher(FxPricingEngine targetEngine, bool manualEvent)
         {
             _fxPricingEngine = targetEngine;
             _cancel = new CancellationTokenSource();
             _manualEvent = manualEvent;
 
-
+            Cache = new List<Cache>();
         }
 
         private void Next(FxPricingEvent fxEvent)
@@ -38,10 +50,20 @@ namespace DisruptorPlayground.Advanced1
             var ccyPair = _ccyPairs[_rand.Next(0, _ccyPairs.Count())];
             var marketplace = _marketplaces[_rand.Next(0, _marketplaces.Count())];
 
-            fxEvent.Ask = mid + spread;
-            fxEvent.Bid = mid - spread;
-            fxEvent.CcyPair = ccyPair;
-            fxEvent.Marketplace = marketplace;
+            var cache = new Cache()
+            {
+                Ask = mid + spread,
+                Bid = mid - spread,
+                CcyPair = ccyPair,
+                Marketplace = marketplace
+            };
+
+            Cache.Add(cache);
+
+            fxEvent.Ask = cache.Ask;
+            fxEvent.Bid = cache.Bid;
+            fxEvent.CcyPair = cache.CcyPair;
+            fxEvent.Marketplace = cache.Marketplace;
             fxEvent.Timestamp = DateTime.Now.Ticks;
         }
 
@@ -56,7 +78,7 @@ namespace DisruptorPlayground.Advanced1
 
         public void PublishBatch(int count)
         {
-            _fxPricingEngine.Publish(Enumerable.Range(0, _rand.Next(0, count))
+            _fxPricingEngine.Publish(Enumerable.Range(0, count)
                                             .Select(_ => new Action<FxPricingEvent>((ev) => Next(ev)))
                                             .ToArray());
         }

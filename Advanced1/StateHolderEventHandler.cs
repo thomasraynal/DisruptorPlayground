@@ -8,26 +8,26 @@ namespace DisruptorPlayground.Advanced1
 
     public class StateHolderEventHandler : IEventHandler<FxPricingEvent>
     {
-        public Dictionary<string, Marketplace> _state;
+        public Dictionary<string, Marketplace> State { get; }
 
         public StateHolderEventHandler()
         {
-            _state = new Dictionary<string, Marketplace>();
+            State = new Dictionary<string, Marketplace>();
         }
 
         private void CreateMarketplaceidNotExist(FxPricingEvent @event)
         {
             var key = @event.Marketplace;
 
-            if (!_state.ContainsKey(key))
-                _state.Add(key, new Marketplace(key));
+            if (!State.ContainsKey(key))
+                State.Add(key, new Marketplace(key));
         }
 
         public void OnEvent(FxPricingEvent data, long sequence, bool endOfBatch)
         {
             CreateMarketplaceidNotExist(data);
 
-            _state[data.Marketplace].Add(new FxPrice(data.CcyPair, data.Bid, data.Ask));
+            State[data.Marketplace].Add(new FxPrice(data.CcyPair, data.Bid, data.Ask));
         }
     }
 }

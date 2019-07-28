@@ -10,7 +10,12 @@ namespace DisruptorPlayground.Advanced1
         private readonly Dictionary<string, List<FxPrice>> _priceHistory;
         public string Name { get; }
 
-        public FxPrice GetCurrentPrice (string assetName)
+        public IEnumerable<FxPrice> GetAll()
+        {
+            return _priceHistory.SelectMany(p => p.Value);
+        }
+
+        public FxPrice GetCurrentPrice(string assetName)
         {
             if (!_priceHistory.ContainsKey(assetName)) return null;
 
