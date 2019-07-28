@@ -15,19 +15,20 @@ namespace DisruptorPlayground.Advanced1
             State = new Dictionary<string, Marketplace>();
         }
 
-        private void CreateMarketplaceidNotExist(FxPricingEvent @event)
+        private Marketplace GetOrCreateMarketplace(string marketplace)
         {
-            var key = @event.Marketplace;
 
-            if (!State.ContainsKey(key))
-                State.Add(key, new Marketplace(key));
+            if (!State.ContainsKey(marketplace))
+                State.Add(marketplace, new Marketplace(marketplace));
+
+            return State[marketplace];
         }
 
         public void OnEvent(FxPricingEvent data, long sequence, bool endOfBatch)
         {
-            CreateMarketplaceidNotExist(data);
+            var marketplace = GetOrCreateMarketplace(data.Marketplace);
 
-            State[data.Marketplace].Add(new FxPrice(data.CcyPair, data.Bid, data.Ask));
+            marketplace.Add(new FxPrice(data.CcyPair, data.Bid, data.Ask));
         }
     }
 }

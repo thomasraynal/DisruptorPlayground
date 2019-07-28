@@ -23,7 +23,7 @@ namespace DisruptorPlayground.Advanced1
         private readonly Random _random = new Random();
         private readonly FxPricingEngine _fxPricingEngine;
         private readonly CancellationTokenSource _cancel;
-        private readonly bool _manualEvent;
+
         private Task _workProc;
 
         private readonly Random _rand = new Random();
@@ -33,13 +33,14 @@ namespace DisruptorPlayground.Advanced1
 
         public List<Cache> Cache { get; }
 
-        public FxPricePublisher(FxPricingEngine targetEngine, bool manualEvent)
+        public FxPricePublisher(FxPricingEngine targetEngine)
         {
             _fxPricingEngine = targetEngine;
             _cancel = new CancellationTokenSource();
-            _manualEvent = manualEvent;
+     
 
             Cache = new List<Cache>();
+
         }
 
         private void Next(FxPricingEvent fxEvent)
@@ -67,13 +68,9 @@ namespace DisruptorPlayground.Advanced1
             fxEvent.Timestamp = DateTime.Now.Ticks;
         }
 
-        public void Start()
+        public void StartGenerateEvents()
         {
-            if (!_manualEvent)
-            {
-                _workProc = Task.Run(DoWork, _cancel.Token);
-            }
-
+            _workProc = Task.Run(DoWork, _cancel.Token);
         }
 
         public void PublishBatch(int count)

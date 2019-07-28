@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace DisruptorPlayground.Advanced1
 {
+   
     public class IOPersistanceEventHandler : IEventHandler<FxPricingEvent>
     {
         private readonly StringBuilder _currentBatch;

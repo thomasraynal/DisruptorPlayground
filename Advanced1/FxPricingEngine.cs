@@ -11,12 +11,12 @@ namespace DisruptorPlayground.Advanced1
 {
     public class FxPricingEngine : IDisposable
     {
-        private readonly Disruptor<FxPricingEvent> _disruptor;
-        private readonly RingBuffer<FxPricingEvent> _ringBuffer;
+        public Disruptor<FxPricingEvent> Disruptor { get; }
+        public RingBuffer<FxPricingEvent> RingBuffer { get; }
 
         public FxPricingEngine(params IEventHandler<FxPricingEvent>[] handlers)
         {
-            _disruptor = new Disruptor<FxPricingEvent>(() => new FxPricingEvent(), 16384, TaskScheduler.Default, ProducerType.Single, new BusySpinWaitStrategy());
+            Disruptor = new Disruptor<FxPricingEvent>(() => new FxPricingEvent(), 16384, TaskScheduler.Default, ProducerType.Single, new BusySpinWaitStrategy());
 
             EventHandlerGroup<FxPricingEvent> group = null;
 
@@ -24,7 +24,7 @@ namespace DisruptorPlayground.Advanced1
             {
                 if (null == group)
                 {
-                    group = _disruptor.HandleEventsWith(handler);
+                    group = Disruptor.HandleEventsWith(handler);
                 }
                 else
                 {
@@ -32,7 +32,9 @@ namespace DisruptorPlayground.Advanced1
                 }
             }
 
-            _ringBuffer = _disruptor.RingBuffer;
+            RingBuffer = Disruptor.RingBuffer;
+
+            Disruptor.Start();
         }
 
         private long WaitUntilNext(int count)
@@ -43,7 +45,7 @@ namespace DisruptorPlayground.Advanced1
             var rand = new Random(Environment.TickCount & int.MaxValue);
             var upperBound = 0L;
 
-            while (!_ringBuffer.TryNext(count, out upperBound))
+            while (!RingBuffer.TryNext(count, out upperBound))
             {
                 for (int i = 0; i < backoff; i++)
                 {
@@ -69,32 +71,27 @@ namespace DisruptorPlayground.Advanced1
 
             foreach (var onNext in onNextBatch)
             {
-                var ev = _ringBuffer[current++];
+                var ev = RingBuffer[current++];
                 onNext(ev);
             }
 
-            _ringBuffer.Publish(next, current - 1);
+            RingBuffer.Publish(next, current - 1);
         }
 
         public void Publish(Action<FxPricingEvent> onNext)
         {
             var next = WaitUntilNext(1);
 
-            var ev = _ringBuffer[next];
+            var ev = RingBuffer[next];
 
             onNext(ev);
 
-            _ringBuffer.Publish(next);
+            RingBuffer.Publish(next);
         }
 
         public void Dispose()
         {
-            _disruptor.Shutdown();
-        }
-
-        public void Start()
-        {
-            _disruptor.Start();
+            Disruptor.Shutdown();
         }
    
     }
