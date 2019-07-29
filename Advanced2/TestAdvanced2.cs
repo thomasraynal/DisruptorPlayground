@@ -3,6 +3,9 @@ using Disruptor.Dsl;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,60 +14,43 @@ namespace DisruptorPlayground.Advanced2
     [TestFixture]
     public class TestAdvanced2
     {
+
         [Test]
         public async Task ShouldBuildDisruptor()
         {
             var ringBuffer = RingBuffer<Event>.CreateSingleProducer(() => new Event(100), 16384, new BlockingWaitStrategy());
-
+            var executor = new BasicExecutor(TaskScheduler.Default);
             var consumerRepository = new ConsumerRepository();
 
             var handlerA = new EventHandlerA();
-          
-            var handlers = new IEventHandler<Event>[] { handlerA };
-            var barrierSequences = new ISequence[0];
+            var handlerABarrier = ringBuffer.NewBarrier(new ISequence[0]);
+            var handlerAEventProcessor = new BatchEventProcessor<Event>(ringBuffer, handlerABarrier, handlerA);
 
-            var processorSequences = new ISequence[handlers.Length];
-            var barrier = ringBuffer.NewBarrier(barrierSequences);
+            consumerRepository.Add(handlerAEventProcessor, handlerA, handlerABarrier);
 
-            var executor = new BasicExecutor(TaskScheduler.Default);
+            var handlerB = new CleanerHandler();
+            var handlerBBarrier = ringBuffer.NewBarrier(new ISequence[] { handlerAEventProcessor.Sequence });
+            var handlerBEventProcessor = new BatchEventProcessor<Event>(ringBuffer, handlerBBarrier, handlerB);
 
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var eventHandler = handlers[i];
-
-                var batchEventProcessor = BatchEventProcessorFactory.Create(ringBuffer, barrier, eventHandler);
-
-                consumerRepository.Add(batchEventProcessor, eventHandler, barrier);
-
-                processorSequences[i] = batchEventProcessor.Sequence;
-
-            }
-
-            ringBuffer.AddGatingSequences(processorSequences);
-
-            foreach (var barrierSequence in barrierSequences)
-            {
-                ringBuffer.RemoveGatingSequence(barrierSequence);
-            }
-
-    
+            consumerRepository.Add(handlerBEventProcessor, handlerB, handlerBBarrier);
 
             foreach (var consumerInfo in consumerRepository)
             {
                 consumerInfo.Start(executor);
             }
 
-
             var next = ringBuffer.Next();
             var ev = ringBuffer[next];
             ringBuffer.Publish(next);
 
-        
+
             await Task.Delay(50);
 
-            Assert.AreEqual(1, ev.Counter);
+            Assert.AreEqual(2, ev.Counter);
 
         }
 
     }
+
+ 
 }

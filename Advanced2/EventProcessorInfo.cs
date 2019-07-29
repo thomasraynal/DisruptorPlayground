@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DisruptorPlayground.Advanced2
 {
-    internal class EventProcessorInfo : IConsumerInfo
+    public class EventProcessorInfo : IConsumerInfo
     {
         public EventProcessorInfo(IEventProcessor eventProcessor, object eventHandler, ISequenceBarrier barrier)
         {

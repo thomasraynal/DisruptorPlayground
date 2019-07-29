@@ -9,6 +9,8 @@ namespace DisruptorPlayground.Advanced2
     {
         public void OnEvent(Event data, long sequence, bool endOfBatch)
         {
+            data.Counter++;
+
             data.Reset();
         }
     }

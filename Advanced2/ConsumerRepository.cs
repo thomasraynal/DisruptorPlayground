@@ -8,6 +8,7 @@ using System.Text;
 
 namespace DisruptorPlayground.Advanced2
 {
+    //https://github.com/disruptor-net/Disruptor-net/blob/9b37a37d16dedfa6b448a662bbea3177f2fe2986/src/Disruptor/Dsl/ConsumerRepository.cs
     internal class ConsumerRepository : IEnumerable<IConsumerInfo>
     {
         private readonly Dictionary<object, EventProcessorInfo> _eventProcessorInfoByEventHandler;
