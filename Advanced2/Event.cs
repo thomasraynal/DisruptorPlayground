@@ -18,7 +18,7 @@ namespace DisruptorPlayground.Advanced2
 
         public void Reset()
         {
-            for (var i = 0; i <= _size; i++)
+            for (var i = 0; i < _size; i++)
             {
                 Data[i] = 0;
             }
