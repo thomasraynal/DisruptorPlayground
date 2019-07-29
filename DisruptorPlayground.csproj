@@ -2,9 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <StartupObject>DisruptorPlayground.Advanced3.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
     <PackageReference Include="CsvHelper" Version="12.1.2" />
     <PackageReference Include="Disruptor" Version="3.4.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />

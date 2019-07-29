@@ -42,10 +42,8 @@ namespace DisruptorPlayground.Advanced2
 
             });
 
-           
-          
-            ringBuffer.Publish(next);
 
+            ringBuffer.Publish(next);
 
             await Task.Delay(50);
 
