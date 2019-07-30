@@ -61,42 +61,43 @@ namespace DisruptorPlayground.Advanced3
             public int N;
 
             private IHasValues[] _proxies;
-            private IHasValues[] _structs;
-            private IHasValues[] _classes;
+            private S[] _structs;
+            private C[] _classes;
 
             [GlobalSetup]
             public void Setup()
             {
                 _proxies = Enumerable.Range(0, N).Select(i => StructProxy.CreateProxyInstance<IHasValues>(new C(i, i + 1))).ToArray();
-                _structs = Enumerable.Range(0, N).Select(i => new S(i, i + 1)).Cast<IHasValues>().ToArray();
+                _structs = Enumerable.Range(0, N).Select(i => new S(i, i + 1)).ToArray();
                 _classes = Enumerable.Range(0, N).Select(i => new C(i, i + 1)).ToArray();
-            }
-
-            public void DoWork(IHasValues[] values)
-            {
-                for (var i = 0; i < N; i++)
-                {
-                    SumValues(values[i]);
-                }
             }
 
 
             [Benchmark(Baseline = true)]
             public void Class()
             {
-                DoWork(_classes);
+                for (var i = 0; i < N; i++)
+                {
+                    SumValues(_classes[i]);
+                }
             }
 
             [Benchmark]
             public void Proxy()
             {
-                DoWork(_proxies);
+                for (var i = 0; i < N; i++)
+                {
+                    SumValues(_proxies[i]);
+                }
             }
-
+            
             [Benchmark]
             public void Struct()
             {
-                DoWork(_structs);
+                for (var i = 0; i < N; i++)
+                {
+                    SumValues(_structs[i]);
+                }
             }
         }
 
