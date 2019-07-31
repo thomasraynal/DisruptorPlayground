@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <StartupObject>DisruptorPlayground.Advanced3.TestAdvanced3_3</StartupObject>
+    <StartupObject>DisruptorPlayground.Advanced3.TestAdvanced3_4_1</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -19,6 +19,7 @@
     <PackageReference Include="Disruptor" Version="3.4.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="NetMQ" Version="4.0.0.207" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     <PackageReference Include="StructureMap" Version="4.7.1" />

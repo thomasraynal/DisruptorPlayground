@@ -3,16 +3,18 @@ using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DisruptorPlayground.Advanced3
 {
+
     public static class TestAdvanced3_3
     {
-        [CoreJob(baseline: true)]
+        [MemoryDiagnoser]
         public class StrucVsClass
         {
-            [Params(1, 100)]
+            [Params(100, 100000)]
             public int N;
 
             private SmallClass[] _smallClasses;
@@ -80,13 +82,14 @@ namespace DisruptorPlayground.Advanced3
                 }
             }
 
-            [GlobalSetup]
+            [IterationSetup]
             public void Setup()
             {
                 _smallClasses = Enumerable.Range(0, N).Select(i => new SmallClass(i)).ToArray();
                 _largeClasses = Enumerable.Range(0, N).Select(i => new LargeClass(i, i + 1, i + 2, i + 3, i + 4, i + 5)).ToArray();
                 _smallStructs = Enumerable.Range(0, N).Select(i => new SmallStruct(i)).ToArray();
                 _largeStructs = Enumerable.Range(0, N).Select(i => new LargeStruct(i, i + 1, i + 2, i + 3, i + 4, i + 5)).ToArray();
+
             }
 
             int Get(SmallClass @class)
@@ -110,12 +113,25 @@ namespace DisruptorPlayground.Advanced3
             }
 
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            int GetForceInlining(ref SmallStruct @class)
+            {
+                return @class.Val;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            int GetForceInlining(ref LargeStruct @class)
+            {
+                return @class.Val;
+            }
+
+
             [Benchmark(Baseline = true)]
             public void SmallClasses()
             {
                 for (var i = 0; i < N; i++)
                 {
-                    Get(_smallClasses[i]);
+                    var r = Get(_smallClasses[i]);
                 }
 
             }
@@ -126,7 +142,17 @@ namespace DisruptorPlayground.Advanced3
             {
                 for (var i = 0; i < N; i++)
                 {
-                    Get(ref _smallStructs[i]);
+                    var r = Get(ref _smallStructs[i]);
+                }
+
+            }
+
+            [Benchmark]
+            public void SmallStructsForceInlining()
+            {
+                for (var i = 0; i < N; i++)
+                {
+                    var r = GetForceInlining(ref _smallStructs[i]);
                 }
 
             }
@@ -136,7 +162,7 @@ namespace DisruptorPlayground.Advanced3
             {
                 for (var i = 0; i < N; i++)
                 {
-                    Get(_largeClasses[i]);
+                   var r = Get(_largeClasses[i]);
                 }
 
             }
@@ -146,7 +172,17 @@ namespace DisruptorPlayground.Advanced3
             {
                 for (var i = 0; i < N; i++)
                 {
-                    Get(ref _largeStructs[i]);
+                    var r = Get(ref _largeStructs[i]);
+                }
+
+            }
+
+            [Benchmark]
+            public void LargeStructsForceInlining()
+            {
+                for (var i = 0; i < N; i++)
+                {
+                    var r = GetForceInlining(ref _largeStructs[i]);
                 }
 
             }
