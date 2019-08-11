@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <StartupObject>DisruptorPlayground.Advanced5.TestAdvanced5_2</StartupObject>
+    <StartupObject>DisruptorPlayground.Advanced4.TestAdvanced4_2</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -22,6 +22,7 @@
     <PackageReference Include="NetMQ" Version="4.0.0.207" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="protobuf-net" Version="2.4.0" />
     <PackageReference Include="StructureMap" Version="4.7.1" />
   </ItemGroup>
   
