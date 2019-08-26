@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace DisruptorPlayground.Advanced5
+namespace DisruptorPlayground.FalseSharing
 {
     [StructLayout(LayoutKind.Auto)]
     public struct AlignedDoubleAuto
@@ -60,7 +60,7 @@ namespace DisruptorPlayground.Advanced5
 
     [TestFixture]
     [MemoryDiagnoser]
-    public class TestAdvanced5
+    public class TestFalseSharing1
     {
         [Test]
         public void TestStruct()
@@ -121,11 +121,11 @@ namespace DisruptorPlayground.Advanced5
 
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<TestAdvanced5>();
+            BenchmarkRunner.Run<TestFalseSharing1>();
         }
     }
 
-    public class TestAdvanced5_2
+    public class TestFalseSharing2
     {
 
 
@@ -326,7 +326,7 @@ namespace DisruptorPlayground.Advanced5
 
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<TestAdvanced5_2>();
+            BenchmarkRunner.Run<TestFalseSharing2>();
         }
     }
 

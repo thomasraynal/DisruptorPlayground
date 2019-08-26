@@ -9,7 +9,7 @@ using System.Text;
 namespace DisruptorPlayground.Advanced3
 {
 
-    public static class TestAdvanced3_3
+    public static class StructVsClassBenchmark
     {
         [MemoryDiagnoser]
         public class StrucVsClass

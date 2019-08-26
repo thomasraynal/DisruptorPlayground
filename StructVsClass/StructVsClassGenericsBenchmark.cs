@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace DisruptorPlayground.Advanced3
 {
@@ -175,103 +176,8 @@ namespace DisruptorPlayground.Advanced3
         }
     }
 
-    //public interface IAdvancedEventProcessor<T> where T : IMessage
-    //{
-    //    void Process(T message);
-    //}
-
-    //public class AdvancedEventProcessor<T> : IAdvancedEventProcessor<T> where T : IMessage
-    //{
-    //    public void Process(T message)
-    //    {
-    //        message.IsProcessed = true;
-    //    }
-    //}
-
-    //public struct AdvancedEventProcessorProxy<T> : IAdvancedEventProcessor<T> where T : IMessage
-    //{
-    //    private readonly AdvancedEventProcessor<T> _proxy;
-
-    //    public AdvancedEventProcessorProxy(AdvancedEventProcessor<T> proxy)
-    //    {
-    //        _proxy = proxy;
-    //    }
-
-    //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //    public void Process(T message)
-    //    {
-    //        _proxy.Process(message);
-    //    }
-    //}
-
-    //public class AdvancedMessageConsumer<T> where T : IMessage
-    //{
-    //    private IAdvancedEventProcessor<T> _processor;
-
-    //    public AdvancedMessageConsumer(bool useProxy)
-    //    {
-    //        var processor = new AdvancedEventProcessor<T>();
-
-    //        if (useProxy)
-    //        {
-    //            _processor = new AdvancedEventProcessorProxy<T>(processor);
-    //        }
-    //        else
-    //        {
-    //            _processor =  processor;
-    //        }
-  
-    //    }
-
-    //    public void Process(T message)
-    //    {
-    //        _processor.Process(message);
-    //    }
-    //}
-
-    //[MemoryDiagnoser]
-    //public class TestAdvanced3_4_2
-    //{
-    //    private Message[] _messages;
-
-    //    [GlobalSetup]
-    //    public void SetUp()
-    //    {
-    //        _messages = Enumerable.Range(0, 1000).Select(i => new Message(i)).ToArray();
-    //    }
-
-    //    [Benchmark(Baseline = true)]
-    //    public void Class()
-    //    {
-    //        var eventProcessor = new AdvancedMessageConsumer<Message>(false);
-
-    //        foreach (var message in _messages)
-    //        {
-    //            eventProcessor.Process(message);
-
-    //        }
-    //    }
-
-    //    [Benchmark]
-    //    public void Proxy()
-    //    {
-    //        var eventProcessor = new AdvancedMessageConsumer<Message>(true);
-
-    //        foreach (var message in _messages)
-    //        {
-    //            eventProcessor.Process(message);
-
-    //        }
-    //    }
-
-    //    public static void Main(string[] args)
-    //    {
-    //        BenchmarkRunner.Run<TestAdvanced3_4_2>();
-    //    }
-    //}
-
     [MemoryDiagnoser]
-    public class TestAdvanced3_4_1
+    public class StructVsClassGenericsBenchmark
     {
         private EventBus _eventBus;
         private EventBusStruct _eventBusStruct;
@@ -417,14 +323,13 @@ namespace DisruptorPlayground.Advanced3
             {
                 var message = new MessageStruct(i);
                 _eventInterfaceProcessor.Process(message);
-
             }
-        }
 
+        }
 
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<TestAdvanced3_4_1>();
+            BenchmarkRunner.Run<StructVsClassGenericsBenchmark>();
         }
 
     }
