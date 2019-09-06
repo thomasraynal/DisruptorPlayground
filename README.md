@@ -73,3 +73,5 @@
 			-  `ref` : pass by reference, property modification allowed- use a `readonly struct` otherwise a defensive copy is created
 
 			-  `in` => pass by reference, no property modification allowed - use a `readonly struct` otherwise a defensive copy is created
+
+		- use `ref struct` definition to garantee that the struct will never be heap allocated

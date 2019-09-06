@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <StartupObject>DisruptorPlayground.Advanced4.TestAdvanced4_2</StartupObject>
+    <StartupObject>DisruptorPlayground.Advanced3.StructVsClassGenericsBenchmark</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
